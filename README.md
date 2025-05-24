@@ -1,118 +1,95 @@
+# Java API Gateway Microservices Project
 
-# Dodo Payments Backend Service (Rust + Actix Web + SQLite)
+This repository contains a simple Spring Boot microservices-based application that demonstrates how to create an API Gateway with service discovery and microservices for quizzes and questions.
 
-A lightweight backend service for managing users, authentication (with JWT), and transactions. Built with **Rust**, **Actix Web**, **Diesel ORM**, and **SQLite**.
-
-## Features
-
-- User registration with password hashing
-- JWT-based user login and authentication
-- Secure transaction creation
-- Account balance computation
-- Logging (to file and console)
-- Modular and testable structure
-
-
-## Tech Stack
-
-- **Rust** (stable)
-- **Actix Web** – Web framework
-- **Diesel** – ORM for SQLite
-- **Argon2** – Password hashing
-- **JWT** – JSON Web Tokens for authentication
-- **Tracing** – Logging (with `tracing` + `tracing-appender`)
-- **dotenvy** – Environment variable loading
-
----
-
-## Folder Structure
+## Project Structure
 
 ```
-src/
-├── db/               # Database pool setup
-├── models/           # DB models using Diesel
-├── routes/           # API route handlers
-├── schema.rs         # Diesel schema (auto-generated)
-├── services/         # Business logic (user, transaction)
-├── utils/            # Utility functions (hashing, JWT)
-└── main.rs           # Server entry point
+Java_Api_Gateway/
+│
+├── ApiGateway/         → Spring Cloud Gateway (API Gateway)
+├── QuizService/        → Microservice managing quizzes
+├── QuestionService/    → Microservice managing questions
+└── ServiceRegistry/    → Eureka Server for service discovery
 ```
 
----
+## Technologies Used
 
-## Setup Instructions
+- Java 17+
+- Spring Boot
+- Spring Cloud Gateway
+- Eureka Discovery Server
+- Maven
 
-### 1. Clone the repo
+## How It Works
+
+- `ServiceRegistry` uses Eureka to register and discover services.
+- `ApiGateway` uses Spring Cloud Gateway to route requests to `QuizService` and `QuestionService`.
+- Each microservice is a Spring Boot application and communicates via REST APIs.
+
+## Prerequisites
+
+- JDK 17 or higher
+- Maven
+- Git
+
+## Running the Project
+
+1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/Devilk3/dodo_assignment.git
-cd dodo-payments
+git clone https://github.com/Devilk3/Java_Api_Gateway.git
+cd Java_Api_Gateway
 ```
 
-### 2. Set up environment
+2. **Build All Projects**
 
-Create a `.env` file:
-
-```env
-DATABASE_URL=sqlite://dodo.db
-JWT_SECRET=1a27c3682b342d3498f3b8a2c0e4d7gn67
-RUST_LOG=info
-```
-
-### 3. Run migrations
+Navigate into each subproject and run:
 
 ```bash
-diesel setup
-diesel migration run
+mvn clean install
 ```
 
-### 4. Run the server
+Repeat for:
+- `ServiceRegistry`
+- `ApiGateway`
+- `QuizService`
+- `QuestionService`
+
+3. **Start Services (in order)**
 
 ```bash
-cargo run
+cd ServiceRegistry
+mvn spring-boot:run
 ```
-
-Server will start at: `http://127.0.0.1:8080`
-
----
-
-## API Endpoints
-
-### Auth
-
-- `POST /register` – Register a new user
-- `POST /login` – Login user and return JWT token
-
-### Transactions
-
-- `POST /transactions` – Create new transaction 
-- `GET /transactions/{user_id}` – Fetch user transactions
-- `GET /balance/{user_id}` – Get user account balance
-
----
-
-## Logging
-
-Logs are stored in the `logs/` folder. Two formats:
-
-- Console: Human-readable
-- File: JSON format (`logs/app.log`)
-
----
-
-## Running Tests
 
 ```bash
-cargo test
+cd ../ApiGateway
+mvn spring-boot:run
 ```
 
----
+```bash
+cd ../QuizService
+mvn spring-boot:run
+```
 
-## License
+```bash
+cd ../QuestionService
+mvn spring-boot:run
+```
 
-MIT License
+4. **Access Eureka Dashboard**
 
----
+- URL: [http://localhost:8761](http://localhost:8761)
+
+5. **Example API Endpoints (via API Gateway)**
+
+- Get quizzes: `http://localhost:8080/quiz`
+- Get questions: `http://localhost:8080/question`
+
+> These are routed by the gateway to the appropriate services.
+
+
 
 ## Author
 
